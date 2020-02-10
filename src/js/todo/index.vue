@@ -6,73 +6,301 @@
       </header>
 
       <main class="main">
-        <form class="register">
+        <!-- フォームがsubmitされたときにaddTodoというメソッドを実行 -->
+        <!-- .preventというのはJavaScriptでのボタンクリック時に、もともとそのタグがもってる挙動を制限するための記述 -->
+        <!-- 意図しない画面遷移、画面更新を避けるため.preventが有効 -->
+        <form class="register" @submit.prevent="targetTodo.id ? editTodo() : addTodo()">
           <div class="register__input">
             <p class="register__input__title">やることのタイトル</p>
             <input
+              v-model="targetTodo.title"
               type="text"
               name="title"
               placeholder="ここにTODOのタイトルを記入してください"
+              required
             >
           </div>
           <div class="register__input">
             <p class="register__input__title">やることの内容</p>
             <textarea
+              v-model="targetTodo.detail"
               name="detail"
               rows="3"
               placeholder="ここにTODOの内容を記入してください。改行は半角スペースに変換されます。"
+              required
             />
           </div>
           <div class="register__submit">
             <button class="register__submit__btn" type="submit" name="button">
-              登録する
+              <template v-if="targetTodo.id">
+                <span>変更する</span>
+              </template>
+              <template v-else>
+                <span>登録する</span>
+              </template>
             </button>
           </div>
         </form>
 
+        <div v-if="errorMessage" class="error">
+          <p class="error__text">{{ errorMessage }}</p>
+        </div>
+
         <div class="todos">
-          <ul class="todos__list">
-            <li>
-              <div class="todos__inner">
-                <div class="todos__completed">
-                  <button class="todos__completed__btn" type="button">未完了</button>
-                </div>
-                <div class="todos__desc">
-                  <h2 class="todos__desc__title">ここにはTodoのタイトルが入ります</h2>
-                  <p class="todos__desc__detail">ここにはTodoの内容が入ります</p>
-                </div>
-                <div class="todos__btn">
-                  <button class="todos__btn__edit" type="button">編集</button>
-                  <button class="todos__btn__delete" type="button">削除</button>
-                </div>
-              </div>
-            </li>
-          </ul>
+          <!-- todolistにコンテンツがある場合 -->
+          <template v-if="todos.length">
+             <!-- keyがないとdataの中のtodosが書き換わるたびに、すべてのTodoが再レンダリングされる -->
+            <div>
+              <ul class="todos__list">
+                <!-- :class="todo.completed ? 'is-completed' : ''"  todo.completed:trueならis-comletedクラスを付与-->
+                <li v-for="todo in todos"
+                    :key="todo.id"
+                    :class="todo.completed ? 'is-completed' : ''"
+                >
+                  <div class="todos__inner">
+                    <div class="todos__completed">
+                      <button class="todos__completed__btn" 
+                              type="button" 
+                              @click="changeCompleted(todo)">
+                        <template v-if="todo.completed">
+                          <span>完了</span>
+                        </template>
+                        <template v-else>
+                          <span>未完了</span>
+                          </template>
+                      </button>
+                    </div>
+                    <div class="todos__desc">
+                      <h2 class="todos__desc__title">{{ todo.title }}</h2>
+                      <p class="todos__desc__detail">{{ todo.detail }}</p>
+                    </div>
+                    <div class="todos__btn">
+                      <button class="todos__btn__edit" 
+                              type="button"
+                              @click="showEditor(todo)">編集</button>
+
+                      <button class="todos__btn__delete" 
+                              type="button" 
+                              @click="deleteTodo(todo.id)">削除</button>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </template>
+
+          <!-- todolistにコンテンツがない場合 -->
+          <template v-else>
+            <p class="todos__empty">やることリストには何も登録されていません。</p>
+          </template>
+
         </div>
       </main>
 
       <footer class="footer">
-        <p>全項目数: 0</p>
-        <p>完了済: 0</p>
-        <p>未完了: 0</p>
+        <p>全項目数:  {{ todos.length }}</p>
+        <p>完了済:  {{ todos.filter(todo => todo.completed).length }}</p>
+        <p>未完了:  {{ todos.filter(todo => !todo.completed).length }}</p>
       </footer>
     </div>
   </div>
 </template>
 
 <script>
+import axios from 'axios';  
+
 export default {
   data() {
     return {
-      todos: [
-        // {
-        //   id: 1,
-        //   title: 'タイトル 01',
-        //   detail: '詳細 01',
-        //   completed: false,
-        // },
-      ],
+      // ここの配列の中身を表示させる
+      todos: [],
+      targetTodo: {
+        id: null,
+        title: '',
+        detail: '',
+        completed: false,
+      },
+      errorMessage: '',
     };
+  },
+  methods: {
+    initTargetTodo() {
+      return {
+        id: null,
+        title: '',
+        detail: '',
+        completed: false,
+      };
+    },
+    hideError() {
+      this.errorMessage = '';
+    },
+    showError(err) {
+      if (err.response) {
+        this.errorMessage = err.response.data.message;
+      } else {
+        this.errorMessage = 'ネットに接続がされていない、もしくはサーバーとの接続がされていません。ご確認ください。';
+      }
+    },
+    // event クリックやサブミットなどのイベントについての情報が入ってるもの
+    addTodo() {
+      // postTodoにObject.assign()で新たにできたオブジェクトを追加
+      const postTodo = Object.assign({}, {
+        title: this.targetTodo.title,
+        detail: this.targetTodo.detail,
+      });
+      // 「axios」のpostメソッドを実行
+      // 第一引数の'http://localhost:3000/api/todos/'に対してPOSTメソッドでリクエストを送る
+      // 第二引数のpostTodoというのはリクエストとともに送る情報
+      // unshift() メソッドは、配列の最初に 1 つ以上の要素を追加し、新しい配列の長さを返す
+      // 追加した Todo を data(状態管理)のtodosの先頭に.unshift()で追加
+      axios.post('http://localhost:3000/api/todos/', postTodo).then(({ data }) => {
+        this.todos.unshift(data);
+        // this.targetTodo = Object.assign({}, this.targetTodo, { title: '', detail: '' });
+        this.targetTodo = this.initTargetTodo();
+        // // 再描画した時の画面遷移した後でerrorMessageを表示させないようにする
+        // this.errorMessage = '';
+        this.hideError();
+      }).catch((err) => {
+        console.log(err);
+        // if (error.response) {
+        //   this.errorMessage = error.response.data.message;
+        // } else {
+        //   this.errorMessage = 'ネットに接続がされていない、もしくはサーバーとの接続がされていません。ご確認ください。';
+        // }
+        this.showError(err);
+      });
+      // console.log(this.targetTodo);
+      // console.log(Object.assign({}, this.targetTodo));
+      // const { target } = event;
+      // console.log('title => ', target.title.value);
+      // console.log('detail => ', target.detail.value);
+    },
+    // 未完成 -> 完成に変更
+    // 対象となるTodoを渡すことでメソッドを定義してるところで受け取れるようにする
+    changeCompleted(todo) {
+      //   this.targetTodo = {
+      //   id: null,
+      //   title: '',
+      //   detail: '',
+      //   completed: false,
+      // };
+      // targetTodo は クリックされた todo の情報
+      const targetTodo = Object.assign({}, todo);
+
+      // http://localhost:3000/api/todos は todos.json であり、 http://localhost:3000/api/todos/${targetTodo.id} で todos.jsonのidを指定
+      axios.patch(`http://localhost:3000/api/todos/${targetTodo.id}`, {
+        completed: !targetTodo.completed,
+      }).then(({ data }) => {
+
+        // data(状態管理)のtodosの配列の中の対象のTodoをその返ってきたオブジェクトで置き換えている
+        // todoItem は リアクティブプロパティのtodosの一つずつのオブジェクトが入る
+        this.todos = this.todos.map((todoItem) => {
+          // console.log(todoItem);
+          // if文の省略形
+          // todos.jsonのidと targetTodoのidを一致させる
+          if (todoItem.id === targetTodo.id) return data; // idを変更してリアクティブプロパティを変更
+          return todoItem; // そのまま返す
+        });
+        // this.errorMessage = ''; 
+        this.hideError();
+      }).catch((err) => {
+        // if (err.response) {
+        //   this.errorMessage = err.response.data.message;
+        // } else {
+        //   this.errorMessage = 'ネットに接続がされていない、もしくはサーバーとの接続がされていません。ご確認ください。';
+        // }
+        this.showError(err);
+      });
+    },
+    showEditor(todo) {
+      this.targetTodo = Object.assign({}, todo);
+      console.log(todo);
+    },
+    editTodo() {
+      // 「タイトル」と「詳細」を変更をせずに「変更する」ボタンをクリックしてもAPIにリクエストを送ってしまうので、その場合はリクエストを送らないようにする
+      const targetTodo = this.todos.find(todo => todo.id === this.targetTodo.id);
+      console.log(this.todos);
+      console.log(this.todos.todo);
+      if (
+        targetTodo.title === this.targetTodo.title
+        && targetTodo.detail === this.targetTodo.detail
+      ) {
+        // this.targetTodo = {
+        //   id: null,
+        //   title: '',
+        //   detail: '',
+        //   completed: false,
+        // };
+        this.targetTodo = this.initTargetTodo();
+        return;
+      }
+
+      // 変更が行われた場合
+      axios.patch(`http://localhost:3000/api/todos/${this.targetTodo.id}`, {
+      // 変更後のTodoの中のタイトルと詳細のオブジェクトとともにリクエストを送信
+        title: this.targetTodo.title,
+        detail: this.targetTodo.detail,
+      }).then(({ data }) => {
+        this.todos = this.todos.map((todo) => {
+          if (todo.id === this.targetTodo.id) return data;
+          return todo;
+        });
+
+        // 変更後のdata(状態管理)のtargetTodoを初期に戻して登録フォームが空になるようにする
+        // this.targetTodo = {
+        //   id: null,
+        //   title: '',
+        //   detail: '',
+        //   completed: false,
+        // };
+        this.targetTodo = this.initTargetTodo();
+
+        // this.errorMessage = '';
+        this.hideError();
+      }).catch((err) => {
+        // if (err.response) {
+        //   this.errorMessage = err.response.data.message;
+        // } else {
+        //   this.errorMessage = 'ネットに接続がされていない、もしくはサーバーとの接続がされていません。ご確認ください。';
+        // }
+        this.showError(err);
+      });
+    },
+    deleteTodo(id) {
+      // console.log(id);
+      axios.delete(`http://localhost:3000/api/todos/${id}`).then(({ data }) => {
+        this.todos = data.todos.reverse();
+        // this.errorMessage = '';
+        this.hideError();
+      }).catch((err) => {
+        // if (err.response) {
+        //   this.errorMessage = err.response.data.message;
+        // } else {
+        //   this.errorMessage = 'ネットに接続がされていない、もしくはサーバーとの接続がされていません。ご確認ください。';
+        // }
+        this.showError(err);
+      });
+    },
+  },
+  created() {
+    // axios.get('http://localhost:3000/api/todos/') は「axios」のgetメソッドを実行
+    // .then(({ data }) => {} は 通信が成功したときに引数の関数が実行
+    axios.get('http://localhost:3000/api/todos/').then(({ data }) => {
+      // console.log(data);
+      // apiから返ってきた todosをdata.todosに格納
+      // reverse() は最初の要素は最後に、最後の要素は最初になる
+      this.todos = data.todos.reverse();
+    }).catch((err) => {
+      // console.log(err);
+      // console.log(err.response);
+      // if (err.response) {
+      //   this.errorMessage = err.response.data.message;
+      // } else {
+      //   this.errorMessage = 'ネットに接続がされていない、もしくはサーバーとの接続がされていません。ご確認ください。';
+      // }
+      this.showError(err);
+    });
   },
 };
 </script>
