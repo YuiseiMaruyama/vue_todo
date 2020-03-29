@@ -1,4 +1,8 @@
 <template lang="html">
+<!--
+  指定したコンポーネントの使用
+  <appWrapper> <app-wrapper> どちらでも可
+-->
   <app-wrapper :todos="todos">
     <app-navi />
     <app-register
@@ -25,6 +29,7 @@
       :error-message="errorMessage"
     />
     <template v-slot:todos>
+      <!-- :todos は、Listコンポーネントにtodosという名前でdata(状態管理)のfilteredTodosを渡している -->
       <app-list
         v-if="filteredTodos.length"
         :todos="filteredTodos"
@@ -42,7 +47,7 @@
 
 <script>
 import axios from 'axios';
-
+// コンポーネントのインポート
 import Wrapper from 'TodoRouterDir/components/Wrapper';
 import Navi from 'TodoRouterDir/components/Navi';
 import { ErrorMessage, EmptyMessage } from 'TodoRouterDir/components/Message';
@@ -51,6 +56,7 @@ import List from 'TodoRouterDir/components/List';
 
 export default {
   components: {
+    // コンポーネントとして使うよという指定
     appWrapper: Wrapper,
     appNavi: Navi,
     appErrorMessage: ErrorMessage,
@@ -87,9 +93,12 @@ export default {
       this.setFilter();
     },
   },
+  // created() vueインスタンスが作られたときに実行されるメソッド
   created() {
     axios.get('http://localhost:3000/api/todos/').then(({ data }) => {
+      // 返ってきたTodo全件の順序を逆にした配列を、data(状態管理)のtodosに入れる
       this.todos = data.todos.reverse();
+      // setFilter()で指定したそれぞれのURLのnameによってdata(状態管理)のfilteredTodosの値を変更
       this.setFilter();
     }).catch((err) => {
       this.showError(err);
@@ -99,6 +108,8 @@ export default {
   methods: {
     setFilter() {
       const routeName = this.$route.name;
+      console.log(this.$route); // routers.jsのrouterの配列
+      console.log(this.$route.name);
       this.todoFilter = routeName;
       if (routeName === 'completedTodos') {
         this.filteredTodos = this.todos.filter(todo => todo.completed);

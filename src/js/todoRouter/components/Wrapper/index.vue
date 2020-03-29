@@ -3,8 +3,10 @@
     <div class="inner">
       <app-header />
       <main class="main">
+        <!-- slotはcontainersに記述されている情報が入る -->
         <slot />
         <div class="todos">
+          <!-- name="todos"が指定されているslotタグには、containersのv-slot:todosが紐付く -->
           <slot name="todos" />
         </div>
       </main>

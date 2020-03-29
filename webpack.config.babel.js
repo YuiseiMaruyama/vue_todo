@@ -16,6 +16,7 @@ const config = {
   devtool: isDev ? 'source-map' : 'eval',
   resolve: {
     extensions: ['.vue', '.js', '.json'],
+    // Webpackで利用するときの設定
     alias: {
       TodoDir: `${src}/js/todo`,
       TodoRouterDir: `${src}/js/todoRouter`,
@@ -32,7 +33,8 @@ const config = {
     hot: true,
     port: 8080,
     contentBase: dist,
-    // historyApiFallback: true,
+    // When using the HTML5 History API, the index.html page will likely have to be served in place of any 404 responses. 
+    historyApiFallback: true,
   },
   entry: {
     index: `${src}/js/index.js`
