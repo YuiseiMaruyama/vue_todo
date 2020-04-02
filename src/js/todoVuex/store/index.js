@@ -148,7 +148,7 @@ const store = new Vuex.Store({
       });
       commit('initTargetTodo');
     },
-    deleteTodo({ commit }, todo) {
+    deleteTodo({ commit }, todo) { 
       const targetTodo = Object.assign({}, todo);
       axios.delete(`http://localhost:3000/api/todos/${targetTodo.id}`).then(({ data }) => {
         // 処理
