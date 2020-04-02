@@ -8,6 +8,7 @@
 export default {
   computed: {
     errorMessage: function() {
+      console.log(this.$store.state.errorMessage);
       return this.$store.state.errorMessage;
     },
   },

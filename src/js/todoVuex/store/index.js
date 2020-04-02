@@ -54,6 +54,8 @@ const store = new Vuex.Store({
     showError(state, payload) {
       if (payload) {
         const errorMessage = payload.data;
+        state.errorMessage = errorMessage;
+        console.log(state.errorMessage);
       } else {
         state.errorMessage = 'ネットに接続がされていない、もしくはサーバーとの接続がされていません。ご確認ください。';
       }

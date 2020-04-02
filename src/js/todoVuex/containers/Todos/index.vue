@@ -5,7 +5,7 @@
     <app-error-message />
     <template v-slot:todos>
       <app-list v-if="todos.length" :todos="todos" />
-      <app-empty-message />
+      <app-empty-message v-if='!todos.length'/>
     </template>
   </app-wrapper>
 </template>
@@ -39,6 +39,9 @@ export default {
     errorMessage: function() {
       return this.$store.state.errorMessage;
     },
+    // isShow() {
+    //   return this.$store.state.isShow;
+    // },
   },
   watch: {
     todos: function(todos) {
