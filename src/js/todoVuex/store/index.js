@@ -53,9 +53,8 @@ const store = new Vuex.Store({
     },
     showError(state, payload) {
       if (payload) {
-        const errorMessage = payload.data;
+        const errorMessage = payload.data; // payload.data とは？
         state.errorMessage = errorMessage;
-        console.log(state.errorMessage);
       } else {
         state.errorMessage = 'ネットに接続がされていない、もしくはサーバーとの接続がされていません。ご確認ください。';
       }
@@ -78,12 +77,8 @@ const store = new Vuex.Store({
         return todoItem;
       });
     },
-    deleteTodo(state, payload) {
-      state.todos = state.todos.map((todoItem) => {
-        if (todoItem.id === payload.id) return payload;
-        return todoItem;
-      });
-      // state.todos = data.todos.reverse(); // ここでstateのtodosにaxiosから返ってきたtodosを置き換える？？
+    deleteTodo(state, todos) {
+      state.todos = todos; // ここでstateのtodosにaxiosから返ってきたtodosを置き換える
     },
   },
   actions: {
@@ -156,11 +151,12 @@ const store = new Vuex.Store({
       });
       commit('initTargetTodo');
     },
-    deleteTodo: function({ commit }, payload) {
-      axios.delete(`http://localhost:3000/api/todos/${payload}`).then(function({ data }) {
+    deleteTodo: function({ commit }, todo) { 
+      axios.delete(`http://localhost:3000/api/todos/${todo.id}`).then(function ({ data }) {
         // 処理
-        // todos = data.todos.reverse();
-        commit('hideError');
+        todos = data.todos.reverse();
+        commit('deleteTodo',todos);
+        commit('hideError'); // API用のサーバーを止めて「削除」ボタンをクリックしたときにエラーを消すため
       }).catch((err) => {
         // 処理
         commit('showError', err.response);

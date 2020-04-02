@@ -39,9 +39,6 @@ export default {
     errorMessage: function() {
       return this.$store.state.errorMessage;
     },
-    // isShow() {
-    //   return this.$store.state.isShow;
-    // },
   },
   watch: {
     todos: function(todos) {
