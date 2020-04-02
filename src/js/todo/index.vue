@@ -292,8 +292,8 @@ export default {
       // reverse() は最初の要素は最後に、最後の要素は最初になる
       this.todos = data.todos.reverse();
     }).catch((err) => {
-      // console.log(err);
-      // console.log(err.response);
+      console.log(err);
+      console.log(err.response);
       // if (err.response) {
       //   this.errorMessage = err.response.data.message;
       // } else {

@@ -2,7 +2,7 @@
   <app-wrapper>
     <app-navi />
     <app-register v-if="todoFilter !== 'completedTodos'" />
-    <app-error-message />
+    <app-error-message v-if='errorMessage'/>
     <template v-slot:todos>
       <app-list v-if="todos.length" :todos="todos" />
       <app-empty-message v-if='!todos.length'/>

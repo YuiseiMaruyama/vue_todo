@@ -138,10 +138,10 @@ export default {
         completed: false,
       };
     },
-    hideError() {
+    hideError() { // エラーを非表示にする処理
       this.errorMessage = '';
     },
-    showError(err) {
+    showError(err) { // エラーを表示する処理
       if (err.response) {
         this.errorMessage = err.response.data.message;
       } else {

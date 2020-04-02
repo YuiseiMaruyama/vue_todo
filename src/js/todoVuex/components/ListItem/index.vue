@@ -58,8 +58,8 @@ export default {
       this.$store.dispatch('showEditor', todo);
     },
     //削除機能追加
-    deleteTodo: function(todo) {
-      this.$store.dispatch('deleteTodo', todo);
+    deleteTodo: function(todo) { 
+      this.$store.dispatch('deleteTodo', todo); //dispatchはアクションを呼び出すメソッド
     },
   },
 };

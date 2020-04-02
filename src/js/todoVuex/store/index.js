@@ -15,8 +15,8 @@ const store = new Vuex.Store({
       detail: '',
       completed: '',
     },
-    errorMessage: 'エラーが起きました。',
-    emptyMessage: 'やることリストは空です。',
+    errorMessage: '',
+    emptyMessage: '',
   },
   getters: {
     completedTodos: (state) => state.todos.filter((todo) => todo.completed),
@@ -49,7 +49,7 @@ const store = new Vuex.Store({
       };
     },
     hideError(state) {
-      state.errorMessage = 'エラーが起きました。';
+      state.errorMessage = '';
     },
     showError(state, payload) {
       if (payload) {
@@ -78,6 +78,13 @@ const store = new Vuex.Store({
         return todoItem;
       });
     },
+    deleteTodo(state, payload) {
+      state.todos = state.todos.map((todoItem) => {
+        if (todoItem.id === payload.id) return payload;
+        return todoItem;
+      });
+      // state.todos = data.todos.reverse(); // ここでstateのtodosにaxiosから返ってきたtodosを置き換える？？
+    },
   },
   actions: {
     setTodoFilter({ commit }, routeName) {
@@ -104,6 +111,7 @@ const store = new Vuex.Store({
         });
         return;
       }
+      commit('hideError'); // 上記エラーを隠す
       const postTodo = Object.assign({}, {
         title: state.targetTodo.title,
         detail: state.targetTodo.detail,
@@ -151,10 +159,8 @@ const store = new Vuex.Store({
     deleteTodo: function({ commit }, payload) {
       axios.delete(`http://localhost:3000/api/todos/${payload}`).then(function({ data }) {
         // 処理
-        // this は Store
-        // this.todos = data.todos.reverse();
-        // this.hideError();
-        // commit('deleteTodo', data);
+        // todos = data.todos.reverse();
+        commit('hideError');
       }).catch((err) => {
         // 処理
         commit('showError', err.response);
