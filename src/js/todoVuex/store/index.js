@@ -148,13 +148,13 @@ const store = new Vuex.Store({
       });
       commit('initTargetTodo');
     },
-    deleteTodo({ commit }, todo) { 
-      const targetTodo = Object.assign({}, todo);
-      axios.delete(`http://localhost:3000/api/todos/${targetTodo.id}`).then(({ data }) => {
+    deleteTodo: function({ commit }, payload) {
+      axios.delete(`http://localhost:3000/api/todos/${payload}`).then(function({ data }) {
         // 処理
-        this.todos = data.todos.reverse();
-        this.hideError();
-        commit('deleteTodo', data);
+        // this は Store
+        // this.todos = data.todos.reverse();
+        // this.hideError();
+        // commit('deleteTodo', data);
       }).catch((err) => {
         // 処理
         commit('showError', err.response);
