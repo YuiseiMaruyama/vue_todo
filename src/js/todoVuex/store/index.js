@@ -151,12 +151,18 @@ const store = new Vuex.Store({
       });
       commit('initTargetTodo');
     },
-    deleteTodo: function({ commit }, todo) { 
-      axios.delete(`http://localhost:3000/api/todos/${todo.id}`).then(function ({ data }) {
+    deleteTodo({ commit }, todo) {
+      axios.delete(`http://localhost:3000/api/todos/${todo.id}`).then(({ data }) => {
         // 処理
-        todos = data.todos.reverse();
-        commit('deleteTodo',todos);
-        commit('hideError'); // API用のサーバーを止めて「削除」ボタンをクリックしたときにエラーを消すため
+        // commit('getTodo',todos);
+        commit('hideError'); // API用のサーバーを止めて「削除」ボタンをクリックしたときからAPI用のサーバーを立ち上げた時にエラーを消すため
+        return new Promise((resolve) => {
+          axios
+            .then(({ data }) => {
+              commit('getTodo',data.todos);
+              resolve()
+            })
+        })
       }).catch((err) => {
         // 処理
         commit('showError', err.response);
