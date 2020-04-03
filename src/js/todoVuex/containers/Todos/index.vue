@@ -13,7 +13,7 @@
 <script>
 import Wrapper from 'TodoVuexDir/components/Wrapper';
 import Navi from 'TodoVuexDir/components/Navi';
-import { ErrorMessage, EmptyMessage } from 'TodoVuexDir/components/Message'; //Messageのindex.js で ErrorMessage, EmptyMessage の二つをexportしているため
+import { ErrorMessage, EmptyMessage } from 'TodoVuexDir/components/Message'; // Messageのindex.js で ErrorMessage, EmptyMessage の二つをexportしているため
 import Register from 'TodoVuexDir/components/Register';
 import List from 'TodoVuexDir/components/List';
 
