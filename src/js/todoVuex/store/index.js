@@ -152,17 +152,15 @@ const store = new Vuex.Store({
       commit('initTargetTodo');
     },
     deleteTodo({ commit }, todo) {
-      axios.delete(`http://localhost:3000/api/todos/${todo.id}`).then(({ data }) => {
-        // 処理
-        // commit('getTodo',todos);
-        commit('hideError'); // API用のサーバーを止めて「削除」ボタンをクリックしたときからAPI用のサーバーを立ち上げた時にエラーを消すため
-        return new Promise((resolve) => {
-          axios
-            .then(({ data }) => {
-              commit('getTodo',data.todos);
-              resolve()
-            })
-        })
+      return new Promise((resolve) => {
+        axios.delete(`http://localhost:3000/api/todos/${todo.id}`).then(({ data }) => {
+          // 処理
+          // axiosから返ってきた配列を逆にしてstateのtodo配列に入れる処理はgetTodo()と同じ処理である
+          // commit('getTodo',todos);
+          commit('hideError'); // API用のサーバーを止めて「削除」ボタンをクリックしたときからAPI用のサーバーを立ち上げた時にエラーを消すため 
+          // commit('getTodo',data.todos);
+          resolve();
+        });
       }).catch((err) => {
         // 処理
         commit('showError', err.response);

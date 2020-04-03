@@ -57,12 +57,15 @@ export default {
     showEditor: function(todo) {
       this.$store.dispatch('showEditor', todo);
     },
-    getTodo: function(todo) { 
-      this.$store.dispatch('getTodo', todo); //dispatchはアクションを呼び出すメソッド
+    getTodos: function(todo) { 
+      this.$store.dispatch('getTodos', todo); //dispatchはアクションを呼び出すメソッド
     },
     //削除機能追加
     deleteTodo: function(todo) { 
-      this.$store.dispatch('deleteTodo', todo); //dispatchはアクションを呼び出すメソッド
+      this.$store.dispatch('deleteTodo', todo).then(() => {
+      // actionが完了したらやりたいこと
+      this.$store.dispatch('getTodos', todo);
+      });
     },
   },
 };
