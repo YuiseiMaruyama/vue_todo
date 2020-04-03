@@ -63,8 +63,8 @@ export default {
     //削除機能追加
     deleteTodo: function(todo) { 
       this.$store.dispatch('deleteTodo', todo).then(() => {
-      // actionが完了したらやりたいこと
-      this.$store.dispatch('getTodos', todo);
+      // actions(指示されたtodoリストのidの削除)が完了したら
+      this.$store.dispatch('getTodos', todo); // 削除後のtodoリストを取得
       });
     },
   },

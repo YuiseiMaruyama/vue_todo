@@ -81,6 +81,7 @@ const store = new Vuex.Store({
     //   state.todos = todos; // ここでstateのtodosにaxiosから返ってきたtodosを置き換える
     // },
   },
+  // actions は同期的でなければならない mutations と違い、非同期処理(今回ならaxiosを利用したHTTP通信)を含むことができる
   actions: {
     setTodoFilter({ commit }, { routeName }) {
       commit('setTodoFilter', routeName);
@@ -152,13 +153,15 @@ const store = new Vuex.Store({
       commit('initTargetTodo');
     },
     deleteTodo({ commit }, { todo }) {
+      // Promiseを使用する理由はactionsの非同期関数(処理の完了を待たず、処理が完了した時点でコールバック関数が呼び出される)は処理の順序を制御できないという問題がある
+      // 今回の課題ではdeleteTodoでtodosのリストから指定されたtodoのidが削除されてからgetTodoが実行される流れだが、
+      // Promiseを使わないとdeleteTodoの処理が終わる前にgetTodoの処理を行うためエラーになる
       return new Promise((resolve) => {
         axios.delete(`http://localhost:3000/api/todos/${todo.id}`).then(({ data }) => {
           // 処理
           // axiosから返ってきた配列を逆にしてstateのtodo配列に入れる処理はgetTodo()と同じ処理である
           // commit('getTodo',todos);
           commit('hideError'); // API用のサーバーを止めて「削除」ボタンをクリックしたときからAPI用のサーバーを立ち上げた時にエラーを消すため 
-          // commit('getTodo',data.todos);
           resolve();
         });
       }).catch((err) => {
