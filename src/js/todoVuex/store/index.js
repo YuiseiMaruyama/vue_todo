@@ -19,12 +19,8 @@ const store = new Vuex.Store({
     emptyMessage: '',
   },
   getters: {
-    completedTodos(state) {
-      return state.todos.filter(function(todo) {
-        return todo.completed;
-      });
-    },
-    incompleteTodos: (state) => state.todos.filter((todo) => !todo.completed),
+    completedTodos(state) { state.todos.filter(todo => todo.completed); },
+    incompleteTodos(state) { state.todos.filter(todo => !todo.completed); },
     completedTodosLength: (state, getters) => getters.completedTodos.length,
     incompleteTodosLength: (state, getters) => getters.incompleteTodos.length,
   },
