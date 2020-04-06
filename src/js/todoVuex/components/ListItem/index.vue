@@ -45,26 +45,25 @@ export default {
   props: {
     todo: {
       type: Object,
-      default: function() {
+      default() {
         return {};
       },
     },
   },
   methods: {
-    changeCompleted: function(todo) {
+    changeCompleted(todo) {
       this.$store.dispatch('changeCompleted', todo);
     },
-    showEditor: function(todo) {
+    showEditor(todo) {
       this.$store.dispatch('showEditor', todo);
     },
-    getTodos: function(todo) { 
-      this.$store.dispatch('getTodos', todo); //dispatchはアクションを呼び出すメソッド
+    getTodos(todo) {
+      this.$store.dispatch('getTodos', todo);
     },
-    //削除機能追加
-    deleteTodo: function(todo) { 
+
+    deleteTodo(todo) {
       this.$store.dispatch('deleteTodo', todo).then(() => {
-      // actions(指示されたtodoリストのidの削除)が完了したら
-      this.$store.dispatch('getTodos', todo); // 削除後のtodoリストを取得
+        this.$store.dispatch('getTodos', todo); // 削除後のtodoリストを取得
       });
     },
   },

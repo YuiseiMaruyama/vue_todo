@@ -7,7 +7,7 @@
 <script>
 export default {
   computed: {
-    errorMessage: function() {
+    errorMessage() {
       console.log(this.$store.state.errorMessage);
       return this.$store.state.errorMessage;
     },

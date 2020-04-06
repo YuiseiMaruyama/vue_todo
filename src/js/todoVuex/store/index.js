@@ -19,7 +19,11 @@ const store = new Vuex.Store({
     emptyMessage: '',
   },
   getters: {
-    completedTodos: (state) => state.todos.filter((todo) => todo.completed),
+    completedTodos(state) {
+      return state.todos.filter(function(todo) {
+        return todo.completed;
+      });
+    },
     incompleteTodos: (state) => state.todos.filter((todo) => !todo.completed),
     completedTodosLength: (state, getters) => getters.completedTodos.length,
     incompleteTodosLength: (state, getters) => getters.incompleteTodos.length,
@@ -157,11 +161,11 @@ const store = new Vuex.Store({
       // 今回の課題ではdeleteTodoでtodosのリストから指定されたtodoのidが削除されてからgetTodoが実行される流れだが、
       // Promiseを使わないとdeleteTodoの処理が終わる前にgetTodoの処理を行うためエラーになる
       return new Promise((resolve) => {
-        axios.delete(`http://localhost:3000/api/todos/${todo.id}`).then(({ data }) => {
+        axios.delete(`http://localhost:3000/api/todos/${todo.id}`).then(() => {
           // 処理
           // axiosから返ってきた配列を逆にしてstateのtodo配列に入れる処理はgetTodo()と同じ処理である
           // commit('getTodo',todos);
-          commit('hideError'); // API用のサーバーを止めて「削除」ボタンをクリックしたときからAPI用のサーバーを立ち上げた時にエラーを消すため 
+          commit('hideError');
           // commit('getTodo',data.todos);
           resolve();
         });
