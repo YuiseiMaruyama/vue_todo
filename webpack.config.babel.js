@@ -22,10 +22,10 @@ const config = {
       TodoRouterDir: `${src}/js/todoRouter`,
       TodoVuexDir: `${src}/js/todoVuex`,
       VuexSample: `${src}/js/todoVuex_sample`,
-    }
+    },
   },
   plugins: [
-    new VueLoaderPlugin()
+    new VueLoaderPlugin(),
   ],
   devServer: {
     open: true,
@@ -37,7 +37,7 @@ const config = {
     historyApiFallback: true,
   },
   entry: {
-    index: `${src}/js/index.js`
+    index: `${src}/js/index.js`,
   },
   output: {
     filename: 'js/[name].js',
@@ -50,7 +50,7 @@ const config = {
         enforce: 'pre',
         exclude: /node_modules/,
         loader: 'eslint-loader',
-        options: { failOnError: false }
+        options: { failOnError: false },
       },
       {
         test: /\.js$/,
@@ -69,29 +69,29 @@ const config = {
           {
             loader: 'css-loader',
             options: {
-              sourceMap: true
-            }
+              sourceMap: true,
+            },
           },
           {
             loader: 'postcss-loader',
             options: {
               sourceMap: true,
               plugins: [
-                require('autoprefixer')({ grid: true })
-              ]
-            }
+                require('autoprefixer')({ grid: true }),
+              ],
+            },
           },
           {
             loader: 'sass-loader',
             options: {
               outputStyle: 'expanded',
-              sourceMap: true
-            }
-          }
-        ]
-      }
-    ]
-  }
-}
+              sourceMap: true,
+            },
+          },
+        ],
+      },
+    ],
+  },
+};
 
 export default config;
